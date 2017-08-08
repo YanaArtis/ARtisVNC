@@ -56,10 +56,14 @@ import android.widget.Button;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
-public class VncCanvasActivity extends Activity implements View.OnGenericMotionListener {
+import net.kiborgov.Moverio.BT200.*;
+
+public class VncCanvasActivity extends Activity implements View.OnGenericMotionListener, IAccelGyroCompassListener {
+	private AccelGyroCompass agc;
 
 	/**
 	 * @author Michael A. MacDonald
+	 * Moverio support added by Yana Artishcheva, August 08, 2017
 	 */
 	class ZoomInputHandler extends AbstractGestureInputHandler {
 
@@ -673,6 +677,9 @@ public class VncCanvasActivity extends Activity implements View.OnGenericMotionL
 		panner = new Panner(this, vncCanvas.handler);
 
 		inputHandler = getInputHandlerById(R.id.itemInputFitToScreen);
+
+		agc = new AccelGyroCompass(this, DeviceType.MOVERIO_BT_200, false);
+		agc.addAccelGyroCompassListener(this);
 	}
 
 	/**
@@ -1075,6 +1082,13 @@ public class VncCanvasActivity extends Activity implements View.OnGenericMotionL
 	}
 
 	boolean defaultKeyDownHandler(int keyCode, KeyEvent evt) {
+		if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ) {
+			vncCanvas.scaling.zoomOut(VncCanvasActivity.this);
+			return true;
+		} else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP ) {
+			vncCanvas.scaling.zoomIn(VncCanvasActivity.this);
+			return true;
+		}
 		if (vncCanvas.processLocalKeyEvent(keyCode, evt))
 			return true;
 		return super.onKeyDown(keyCode, evt);
@@ -1364,6 +1378,7 @@ public class VncCanvasActivity extends Activity implements View.OnGenericMotionL
 	static final String TOUCH_ZOOM_MODE = "TOUCH_ZOOM_MODE";
 	
 	static final String TOUCHPAD_MODE = "TOUCHPAD_MODE";
+	static final String MOUSE_MODE = "MOUSE";
 
 	/**
 	 * In fit-to-screen mode, no panning. Trackball and touchscreen work as
@@ -1712,5 +1727,22 @@ public class VncCanvasActivity extends Activity implements View.OnGenericMotionL
 			return "DPAD_PAN_TOUCH_MOUSE";
 		}
 
+	}
+
+	public void onAccelGyroCompassEvent (AccelGyroCompassEvent event) {
+		/*
+		 if (event.isAccMeasured) {
+			 int dx = (int)(event.gyroYData * 100);
+			 int dy = (int)(event.gyroXData * 100);
+			 vncCanvas.processPointerEvent(dx, dy, 0);
+		 }
+		 */
+		if (event.isGyroMeasured) {
+			int dx = (int)(event.gyroYData * 30);
+			int dy = (int)(event.gyroXData * 30);
+			try {
+				vncCanvas.pan(-dx, -dy);
+			} catch (Exception e) {}
+		}
 	}
 }

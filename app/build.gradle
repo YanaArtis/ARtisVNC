@@ -22,6 +22,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':zoomerWithKeys')
+    compile files('libs/BT200Ctrl.jar')
 }

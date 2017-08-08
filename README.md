@@ -1,4 +1,4 @@
-# androidVNC
-Exported from https://code.google.com/p/android-vnc-viewer/.  
+# ARtisVNC
+Forked from https://github.com/binkybear/androidVNC.
 
-Modified to build in Android Studio.
+Modified for Epson Moverio BT-200 AR-eyewear.
